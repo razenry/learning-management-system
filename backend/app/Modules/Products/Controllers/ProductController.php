@@ -13,9 +13,9 @@ class ProductController extends BaseController
 {
     public function __construct(private ProductService $productService) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $products = $this->productService->getAll();
+        $products = $this->productService->getAll($request->query('academic_level_id'));
         return $this->successResponse(ProductResource::collection($products), 'Products retrieved successfully');
     }
 
