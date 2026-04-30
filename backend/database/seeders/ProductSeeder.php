@@ -66,13 +66,16 @@ class ProductSeeder extends Seeder
                 'price' => 200000,
                 'description' => 'Tambahan program menghafal Qur’an',
                 'is_active' => true,
-                'academic_level_id' => null, // Addon available for all
+                'academic_level_id' => null,
                 'year_active' => null
             ],
         ];
 
-        foreach ($products as $product) {
-            Product::create($product);
+        foreach ($products as $productData) {
+            Product::updateOrCreate(
+                ['name' => $productData['name']],
+                $productData
+            );
         }
     }
 }

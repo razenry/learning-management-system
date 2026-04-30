@@ -17,54 +17,61 @@ class UserSeeder extends Seeder
         $siswaRole = Role::where('name', 'siswa')->first();
         $waliRole = Role::where('name', 'wali')->first();
 
-        // Superadmin
-        $superAdmin = User::create([
-            'name' => 'Super Admin',
-            'email' => 'superadmin@lms.com',
-            'password' => Hash::make('password'),
-            'role_id' => $superAdminRole->id,
-            'phone' => '081234567890'
-        ]);
-        $superAdmin->assignRole('superadmin');
+        $users = [
+            [
+                'name' => 'Super Admin',
+                'email' => 'superadmin@lms.com',
+                'password' => Hash::make('password'),
+                'role_id' => $superAdminRole->id,
+                'phone' => '081234567890',
+                'role_name' => 'superadmin'
+            ],
+            [
+                'name' => 'Admin User',
+                'email' => 'admin@lms.com',
+                'password' => Hash::make('password'),
+                'role_id' => $adminRole->id,
+                'phone' => '081234567891',
+                'role_name' => 'admin'
+            ],
+            [
+                'name' => 'Guru Pengajar',
+                'email' => 'guru@lms.com',
+                'password' => Hash::make('password'),
+                'role_id' => $guruRole->id,
+                'phone' => '081234567892',
+                'role_name' => 'guru'
+            ],
+            [
+                'name' => 'Siswa Belajar',
+                'email' => 'siswa@lms.com',
+                'password' => Hash::make('password'),
+                'role_id' => $siswaRole->id,
+                'phone' => '081234567893',
+                'role_name' => 'siswa'
+            ],
+            [
+                'name' => 'Wali Murid',
+                'email' => 'wali@lms.com',
+                'password' => Hash::make('password'),
+                'role_id' => $waliRole->id,
+                'phone' => '081234567894',
+                'role_name' => 'wali'
+            ],
+        ];
 
-        // Admin
-        $admin = User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@lms.com',
-            'password' => Hash::make('password'),
-            'role_id' => $adminRole->id,
-            'phone' => '081234567891'
-        ]);
-        $admin->assignRole('admin');
-
-        // Guru
-        $guru = User::create([
-            'name' => 'Guru Pengajar',
-            'email' => 'guru@lms.com',
-            'password' => Hash::make('password'),
-            'role_id' => $guruRole->id,
-            'phone' => '081234567892'
-        ]);
-        $guru->assignRole('guru');
-
-        // Siswa
-        $siswa = User::create([
-            'name' => 'Siswa Belajar',
-            'email' => 'siswa@lms.com',
-            'password' => Hash::make('password'),
-            'role_id' => $siswaRole->id,
-            'phone' => '081234567893'
-        ]);
-        $siswa->assignRole('siswa');
-
-        // Wali
-        $wali = User::create([
-            'name' => 'Wali Murid',
-            'email' => 'wali@lms.com',
-            'password' => Hash::make('password'),
-            'role_id' => $waliRole->id,
-            'phone' => '081234567894'
-        ]);
-        $wali->assignRole('wali');
+        foreach ($users as $userData) {
+            $roleName = $userData['role_name'];
+            unset($userData['role_name']);
+            
+            $user = User::updateOrCreate(
+                ['email' => $userData['email']],
+                $userData
+            );
+            
+            if (!$user->hasRole($roleName)) {
+                $user->assignRole($roleName);
+            }
+        }
     }
 }
