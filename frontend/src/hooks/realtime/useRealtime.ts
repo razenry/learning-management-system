@@ -25,7 +25,7 @@ export function useRealtime(channel: string, event: string, queryKeys: string[][
     });
 
     return () => {
-      echo.leaveChannel(channel);
+      echo?.leaveChannel(channel);
     };
   }, [channel, event, queryKeys, queryClient, message]);
 }

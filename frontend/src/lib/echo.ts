@@ -4,7 +4,7 @@ import Pusher from 'pusher-js';
 declare global {
   interface Window {
     Pusher: typeof Pusher;
-    Echo: Echo;
+    Echo: Echo<any>;
   }
 }
 
@@ -15,8 +15,8 @@ if (typeof window !== 'undefined') {
     broadcaster: 'reverb',
     key: process.env.NEXT_PUBLIC_REVERB_APP_KEY || 'lms_key',
     wsHost: process.env.NEXT_PUBLIC_REVERB_HOST || 'localhost',
-    wsPort: Number(process.env.NEXT_PUBLIC_REVERB_PORT) || 8080,
-    wssPort: Number(process.env.NEXT_PUBLIC_REVERB_PORT) || 8080,
+    wsPort: process.env.NEXT_PUBLIC_REVERB_PORT ? parseInt(process.env.NEXT_PUBLIC_REVERB_PORT) : 8080,
+    wssPort: process.env.NEXT_PUBLIC_REVERB_PORT ? parseInt(process.env.NEXT_PUBLIC_REVERB_PORT) : 8080,
     forceTLS: (process.env.NEXT_PUBLIC_REVERB_SCHEME || 'http') === 'https',
     enabledTransports: ['ws', 'wss'],
   });
