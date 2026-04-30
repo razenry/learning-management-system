@@ -8,11 +8,10 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->call([
-            RoleSeeder::class,
-            AcademicLevelSeeder::class,
-            ProductSeeder::class,
-            UserSeeder::class,
-        ]);
+        if (app()->environment('local')) {
+            $this->call(DevDummySeeder::class);
+        } else {
+            $this->call(ProductionSeeder::class);
+        }
     }
 }
