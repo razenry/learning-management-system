@@ -10,12 +10,18 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'type', 'price', 'description', 'is_active'];
+    protected $fillable = ['name', 'type', 'price', 'description', 'is_active', 'academic_level_id', 'year_active'];
 
     protected $casts = [
         'is_active' => 'boolean',
         'price' => 'integer',
+        'year_active' => 'integer',
     ];
+
+    public function academicLevel()
+    {
+        return $this->belongsTo(\App\Models\AcademicLevel::class);
+    }
 
     public function subscriptionItems()
     {
