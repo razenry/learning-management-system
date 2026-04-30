@@ -18,17 +18,33 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email || !password) {
+      toast.error('Please enter both email and password');
+      return;
+    }
+    
     setIsLoading(true);
     try {
+      console.log('Attempting login to:', apiClient.defaults.baseURL);
       const res = await apiClient.post('/auth/login', { email, password });
-      setAuth(res.data.data.user, res.data.data.token);
-      toast.success('Welcome to LMS Razenry!');
+      
+      const { user, token } = res.data.data;
+      setAuth(user, token);
+      
+      toast.success(`Welcome back, ${user.name}!`);
       router.push('/dashboard');
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Login failed');
+      console.error('Login error:', err);
+      const message = err.response?.data?.message || 'Connection refused. Check if the backend is running on port 8000.';
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleQuickLogin = (email: string) => {
+    setEmail(email);
+    setPassword('password');
   };
 
   return (
@@ -66,18 +82,30 @@ export default function LoginPage() {
                 required
               />
             </div>
-            <Button className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-semibold transition-all duration-300" disabled={isLoading}>
-              {isLoading ? 'Signing in...' : 'Sign In'}
+            <Button 
+              type="submit"
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-semibold transition-all duration-300 shadow-lg shadow-blue-500/20" 
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  <span>Signing in...</span>
+                </div>
+              ) : 'Sign In'}
             </Button>
           </form>
           
-          <div className="mt-6 text-center space-y-2">
-            <p className="text-xs text-slate-500 uppercase font-semibold tracking-wider">Default Accounts</p>
+          <div className="mt-8 text-center space-y-3">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-800"></span></div>
+              <div className="relative flex justify-center text-xs uppercase"><span className="bg-slate-900 px-2 text-slate-500">Demo Accounts</span></div>
+            </div>
             <div className="grid grid-cols-2 gap-2">
-              <QuickLogin email="superadmin@lms.com" label="Superadmin" onClick={setEmail} />
-              <QuickLogin email="admin@lms.com" label="Admin" onClick={setEmail} />
-              <QuickLogin email="guru@lms.com" label="Guru" onClick={setEmail} />
-              <QuickLogin email="siswa@lms.com" label="Siswa" onClick={setEmail} />
+              <QuickLogin email="superadmin@lms.com" label="Superadmin" onClick={handleQuickLogin} />
+              <QuickLogin email="admin@lms.com" label="Admin" onClick={handleQuickLogin} />
+              <QuickLogin email="guru@lms.com" label="Teacher" onClick={handleQuickLogin} />
+              <QuickLogin email="siswa@lms.com" label="Student" onClick={handleQuickLogin} />
             </div>
           </div>
         </CardContent>
@@ -89,8 +117,9 @@ export default function LoginPage() {
 function QuickLogin({ email, label, onClick }: { email: string, label: string, onClick: (e: string) => void }) {
   return (
     <button 
+      type="button"
       onClick={() => onClick(email)}
-      className="text-xs py-1 px-2 rounded bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-blue-400 transition-colors"
+      className="text-[10px] py-1.5 px-2 rounded bg-slate-800/30 text-slate-400 border border-slate-800/50 hover:bg-slate-800 hover:text-blue-400 hover:border-blue-500/30 transition-all duration-200"
     >
       {label}
     </button>

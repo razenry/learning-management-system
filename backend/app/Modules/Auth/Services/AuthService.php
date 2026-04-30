@@ -34,6 +34,9 @@ class AuthService
             ]);
         }
 
+        // Load roles so frontend can use role-based navigation
+        $user->load('roles');
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return [

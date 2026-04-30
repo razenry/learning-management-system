@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -19,10 +20,13 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (\Throwable $e, Request $request) {
             if ($request->is('api/*')) {
+                $code = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
+                if ($code < 100 || $code >= 600) $code = 500;
+                
                 return response()->json([
                     'status' => 'error',
                     'message' => $e->getMessage(),
-                ], 500);
+                ], $code);
             }
         });
     })->create();

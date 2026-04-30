@@ -1,11 +1,19 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+interface Role {
+  id: number;
+  name: string;
+  guard_name: string;
+}
+
 interface User {
   id: number;
   name: string;
   email: string;
-  roles: { name: string }[];
+  role_id: number;
+  phone?: string;
+  roles: Role[];
 }
 
 interface AuthState {
@@ -15,6 +23,7 @@ interface AuthState {
   logout: () => void;
   isAuthenticated: () => boolean;
   hasRole: (role: string) => boolean;
+  getPrimaryRole: () => string;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -26,7 +35,12 @@ export const useAuthStore = create<AuthState>()(
         if (typeof window !== 'undefined') {
           localStorage.setItem('auth_token', token);
         }
-        set({ user, token });
+        // Ensure roles is always an array
+        const safeUser = {
+          ...user,
+          roles: user.roles ?? [],
+        };
+        set({ user: safeUser, token });
       },
       logout: () => {
         if (typeof window !== 'undefined') {
@@ -37,11 +51,25 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: () => !!get().token,
       hasRole: (role) => {
         const user = get().user;
-        return user ? user.roles.some((r) => r.name === role) : false;
+        if (!user) return false;
+        return (user.roles ?? []).some((r) => r.name === role);
+      },
+      getPrimaryRole: () => {
+        const user = get().user;
+        if (!user || !user.roles || user.roles.length === 0) return 'user';
+        return user.roles[0].name;
       },
     }),
     {
       name: 'auth-storage',
+      version: 2, // Bumped to clear stale sessions missing roles
+      migrate: (persistedState: any, version: number) => {
+        if (version < 2) {
+          // Old sessions don't have roles, force logout
+          return { user: null, token: null };
+        }
+        return persistedState;
+      },
     }
   )
 );

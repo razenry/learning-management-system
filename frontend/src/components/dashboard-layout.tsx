@@ -33,11 +33,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         <nav className="flex-1 p-4 space-y-2">
           <SidebarItem href="/dashboard" icon={<LayoutDashboard size={20} />} label="Dashboard" />
           
-          {user.roles.some(r => r.name === 'admin' || r.name === 'superadmin') && (
+          {(user.roles ?? []).some(r => r.name === 'admin' || r.name === 'superadmin') && (
             <SidebarItem href="/dashboard/reports" icon={<FileText size={20} />} label="Reports" />
           )}
           
-          {user.roles.some(r => r.name === 'guru') && (
+          {(user.roles ?? []).some(r => r.name === 'guru') && (
             <>
               <SidebarItem href="/dashboard/attendance" icon={<QrCode size={20} />} label="Attendance" />
               <SidebarItem href="/dashboard/classes" icon={<BookOpen size={20} />} label="Classes" />
@@ -54,7 +54,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             </div>
             <div className="flex-1 truncate">
               <p className="text-sm font-medium truncate">{user.name}</p>
-              <p className="text-xs text-slate-400 truncate">{user.roles[0]?.name}</p>
+              <p className="text-xs text-slate-400 truncate capitalize">{(user.roles ?? [])[0]?.name ?? 'user'}</p>
             </div>
           </div>
           <Button variant="ghost" className="w-full justify-start text-slate-400 hover:text-red-400 hover:bg-red-400/10" onClick={logout}>
